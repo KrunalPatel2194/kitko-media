@@ -1,14 +1,24 @@
+// src/types/article.types.ts
 export interface Article {
-    id: string;
-    title: string;
-    content: string;
-    author: string;
-    publishDate: string;
-    status: 'draft' | 'published';
-    category: 'mining' | 'crypto';
-    createdAt: string;
-    updatedAt: string;
-  }
+  id?: string;
+  title: string;
+  titleFr?: string;
+  content: string;
+  contentFr?: string;
+  author: string;
+  publishDate: Date;
+  status: 'draft' | 'published';
+  category: 'mining' | 'crypto';
+  tags?: string[];
+  relatedCompanies?: string[];
+  marketData?: {
+    price?: number;
+    marketCap?: number;
+    change24h?: number;
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
+}
   
   export interface PaginatedResponse<T> {
     data: T[];

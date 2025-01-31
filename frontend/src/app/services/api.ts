@@ -32,5 +32,9 @@ const api = axios.create({
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/articles/${id}`);
+  },
+  generateFromPress: async (data: { pressRelease: string }) => {
+    const response = await api.post('/articles/generate', data);
+    return response.data;
   }
 };

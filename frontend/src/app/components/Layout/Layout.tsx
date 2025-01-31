@@ -20,6 +20,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               >
                 Create Article
               </Link>
+              <Link 
+  href="/articles/generate" 
+  className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 ml-4"
+>
+  Generate from Press Release
+</Link>
             </div>
           </div>
         </div>
