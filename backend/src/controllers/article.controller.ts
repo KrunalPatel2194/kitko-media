@@ -4,6 +4,8 @@ import { ArticleService } from '../services/article.service';
 import { catchAsync } from '../utils/catchAsync';
 import { validateRequest } from '../utils/validation';
 import { ApiError } from '../utils/ApiError';
+import { AIService } from '../services/ai.service';
+import { MarketService } from '../services/market.service';
 
 export class ArticleController {
   static createArticle = catchAsync(async (req: Request, res: Response) => {
@@ -61,7 +63,35 @@ export class ArticleController {
     }
     res.status(204).send();
   });
+  // src/controllers/article.controller.ts
+static generateFromPress = catchAsync(async (req: Request, res: Response) => {
+  try {
+    const { pressRelease } = req.body;
+    if (!pressRelease) {
+      throw new ApiError('Press release content is required', 400, 'VALIDATION_ERROR');
+    }
 
+    // Generate content sequentially to avoid API rate limits
+    const content = await AIService.generateArticle(pressRelease);
+    const contentFr = await AIService.translateToFrench(content);
+    console.log(content , contentFr)
+    const article = await ArticleService.createArticle({
+      title: "Generated Article", // You might want to extract title from content
+      titleFr: "Article Généré",
+      content,
+      contentFr,
+      author: "AI Generator",
+      publishDate: new Date(),
+      status: 'draft',
+      category: 'mining'
+    });
+
+    res.status(201).json({ data: article });
+  } catch (error) {
+    console.error('Article generation error:', error);
+    throw new ApiError('Failed to generate article', 500, 'GENERATION_ERROR');
+  }
+});
   
 }
 

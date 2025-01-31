@@ -1,15 +1,25 @@
 // src/types/article.types.ts
+// src/types/article.types.ts
 export interface IArticle {
-    id?: string;
-    title: string;
-    content: string;
-    author: string;
-    publishDate: Date;
-    status: 'draft' | 'published';
-    category: 'mining' | 'crypto';
-    createdAt?: Date;
-    updatedAt?: Date;
-  }
+  id?: string;
+  title: string;
+  titleFr?: string;
+  content: string;
+  contentFr?: string;
+  author: string;
+  publishDate: Date;
+  status: 'draft' | 'published';
+  category: 'mining' | 'crypto';
+  tags?: string[];
+  relatedCompanies?: string[];
+  marketData?: {
+    price?: number;
+    marketCap?: number;
+    change24h?: number;
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
+}
   
   export interface PaginationParams {
     page?: number;

@@ -11,5 +11,6 @@ router.get('/', ArticleController.getArticles);
 router.get('/:id', ArticleController.getArticleById);
 router.put('/:id', validate(updateArticleValidation), ArticleController.updateArticle);
 router.delete('/:id', ArticleController.deleteArticle);
+router.post('/generate', ArticleController.generateFromPress)
 
 export { router as articleRoutes };
