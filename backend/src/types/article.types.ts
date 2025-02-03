@@ -1,47 +1,46 @@
 // src/types/article.types.ts
-// src/types/article.types.ts
-export interface IArticle {
-  id?: string;
+export interface MarketData {
+  price?: number;
+  marketCap?: number;
+  change24h?: number;
+}
+
+export interface Article {
+  id: string;
   title: string;
   titleFr?: string;
   content: string;
   contentFr?: string;
-  author: string;
-  publishDate: Date;
-  status: 'draft' | 'published';
+  status: 'published' | 'draft';
   category: 'mining' | 'crypto';
+  author: string;
+  publishDate: string;
   tags?: string[];
   relatedCompanies?: string[];
-  marketData?: {
-    price?: number;
-    marketCap?: number;
-    change24h?: number;
-  };
-  createdAt?: Date;
-  updatedAt?: Date;
+  marketData?: MarketData;
+  createdAt: string;
+  updatedAt?: string;
 }
-  
-  export interface PaginationParams {
-    page?: number;
-    limit?: number;
-    sort?: string;
-    order?: 'asc' | 'desc';
-  }
-  
-  export interface PaginatedResponse<T> {
-    data: T[];
-    pagination: {
-      currentPage: number;
-      totalPages: number;
-      totalItems: number;
-      itemsPerPage: number;
-    };
-  }
 
-export interface GetArticlesParams {
-    page?: number;
-    limit?: number;
-    status?: 'draft' | 'published';
-    category?: 'mining' | 'crypto';
-    query?: any;
-  }
+export interface ArticleFilters {
+  search?: string;
+  tags?: string[];
+  companies?: string[];
+  startDate?: string;
+  endDate?: string;
+  language?: 'en' | 'fr';
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+    limit: number;
+  };
+}

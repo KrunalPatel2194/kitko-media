@@ -1,11 +1,11 @@
 // src/controllers/article.controller.ts
 import { Request, Response } from 'express';
 import { ArticleService } from '../services/article.service';
-import { catchAsync } from '../utils/catchAsync';
-import { validateRequest } from '../utils/validation';
-import  {ApiError}  from '../utils/ApiError';
 import { AIService } from '../services/ai.service';
 import { MarketService } from '../services/market.service';
+import { catchAsync } from '../utils/catchAsync';
+import { validateRequest } from '../utils/validation';
+import { ApiError } from '../utils/ApiError';
 
 export class ArticleController {
   static createArticle = catchAsync(async (req: Request, res: Response) => {
@@ -15,15 +15,17 @@ export class ArticleController {
   });
 
   static getArticles = catchAsync(async (req: Request, res: Response) => {
-    const { page, limit, status, category, search } = req.query;
+    const { page, limit, status, category, search, language = 'en' } = req.query;
     const query: any = {};
    
     if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
-        { author: { $regex: search, $options: 'i' } }
-      ];
+      const searchFields = language === 'fr' 
+        ? ['titleFr', 'contentFr'] 
+        : ['title', 'content'];
+      
+      query.$or = searchFields.map(field => ({
+        [field]: { $regex: search, $options: 'i' }
+      }));
     }
    
     if (status) query.status = status;
@@ -37,13 +39,25 @@ export class ArticleController {
       query
     });
     res.json(result);
-   });
+  });
 
   static getArticleById = catchAsync(async (req: Request, res: Response) => {
+    const { language = 'en' } = req.query;
     const article = await ArticleService.getArticleById(req.params.id);
     if (!article) {
       throw new ApiError('Article not found', 404, 'ARTICLE_NOT_FOUND');
     }
+    
+    // If French content is requested but not available, generate it
+    if (language === 'fr' && !article.contentFr) {
+      article.contentFr = await AIService.translateToFrench(article.content);
+      article.titleFr = await AIService.translateToFrench(article.title);
+      await ArticleService.updateArticle(article.id!, {
+        contentFr: article.contentFr,
+        titleFr: article.titleFr
+      });
+    }
+    
     res.json({ data: article });
   });
 
@@ -63,9 +77,8 @@ export class ArticleController {
     }
     res.status(204).send();
   });
-  // src/controllers/article.controller.ts
-static generateFromPress = catchAsync(async (req: Request, res: Response) => {
-  try {
+
+  static generateFromPress = catchAsync(async (req: Request, res: Response) => {
     const { pressRelease } = req.body;
     if (!pressRelease) {
       throw new ApiError('Press release content is required', 400, 'VALIDATION_ERROR');
@@ -73,25 +86,51 @@ static generateFromPress = catchAsync(async (req: Request, res: Response) => {
 
     // Generate content sequentially to avoid API rate limits
     const content = await AIService.generateArticle(pressRelease);
+    const metadata = await AIService.extractMetadata(content);
     const contentFr = await AIService.translateToFrench(content);
-    console.log(content , contentFr)
+    const titleEn = await AIService.generateSEOTitle(content, 'en');
+    const titleFr = await AIService.generateSEOTitle(contentFr, 'fr');
+
     const article = await ArticleService.createArticle({
-      title: "Generated Article", // You might want to extract title from content
-      titleFr: "Article Généré",
+      title: titleEn,
+      titleFr: titleFr,
       content,
       contentFr,
       author: "AI Generator",
       publishDate: new Date(),
       status: 'draft',
-      category: 'mining'
+      category: 'mining',
+      tags: metadata.tags,
+      relatedCompanies: metadata.relatedCompanies
     });
 
-    res.status(201).json({ data: article });
-  } catch (error) {
-    console.error('Article generation error:', error);
-    throw new ApiError('Failed to generate article', 500, 'GENERATION_ERROR');
-  }
-});
-  
-}
+    // Update market data asynchronously
+    if (metadata.relatedCompanies.length > 0) {
+      MarketService.updateArticleMarketData(article.id!).catch(console.error);
+    }
 
+    res.status(201).json({ data: article });
+  });
+
+  static searchArticles = catchAsync(async (req: Request, res: Response) => {
+    const { tags, companies, startDate, endDate, language = 'en' } = req.query;
+    const query: any = {};
+
+    if (tags) {
+      query.tags = { $in: (tags as string).split(',') };
+    }
+
+    if (companies) {
+      query.relatedCompanies = { $in: (companies as string).split(',') };
+    }
+
+    if (startDate || endDate) {
+      query.publishDate = {};
+      if (startDate) query.publishDate.$gte = new Date(startDate as string);
+      if (endDate) query.publishDate.$lte = new Date(endDate as string);
+    }
+
+    const result = await ArticleService.getArticles({ query });
+    res.json(result);
+  });
+}

@@ -1,4 +1,3 @@
-// src/models/Article.ts
 import mongoose, { Schema, Document } from 'mongoose';
 import { IArticle } from '../types/article.types';
 
@@ -12,9 +11,17 @@ const articleSchema = new Schema<IArticleDocument>(
       trim: true,
       maxlength: [200, 'Title cannot be more than 200 characters']
     },
+    titleFr: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'French title cannot be more than 200 characters']
+    },
     content: {
       type: String,
       required: [true, 'Content is required']
+    },
+    contentFr: {
+      type: String
     },
     author: {
       type: String,
@@ -40,6 +47,19 @@ const articleSchema = new Schema<IArticleDocument>(
         message: '{VALUE} is not a valid category'
       },
       required: [true, 'Category is required']
+    },
+    tags: [{
+      type: String,
+      trim: true
+    }],
+    relatedCompanies: [{
+      type: String,
+      trim: true
+    }],
+    marketData: {
+      price: Number,
+      marketCap: Number,
+      change24h: Number
     }
   },
   {
@@ -55,8 +75,12 @@ const articleSchema = new Schema<IArticleDocument>(
   }
 );
 
+// Indexes
 articleSchema.index({ status: 1, category: 1 });
 articleSchema.index({ publishDate: -1 });
 articleSchema.index({ createdAt: -1 });
+articleSchema.index({ title: 'text', content: 'text', titleFr: 'text', contentFr: 'text' });
+articleSchema.index({ tags: 1 });
+articleSchema.index({ relatedCompanies: 1 });
 
 export const Article = mongoose.model<IArticleDocument>('Article', articleSchema);

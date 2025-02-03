@@ -3,14 +3,19 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Article } from '../../types/article';
+import { TagInput } from './../common/TagInput';
 
 const articleSchema = z.object({
   title: z.string().min(1, 'Title is required'),
+  titleFr: z.string().optional(),
   content: z.string().min(1, 'Content is required'),
+  contentFr: z.string().optional(),
   author: z.string().min(1, 'Author is required'),
   publishDate: z.string().min(1, 'Publish date is required'),
   category: z.enum(['mining', 'crypto']),
-  status: z.enum(['draft', 'published'])
+  status: z.enum(['draft', 'published']),
+  tags: z.array(z.string()).optional(),
+  relatedCompanies: z.array(z.string()).optional()
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -23,16 +28,23 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    setValue,
+    watch
   } = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
     defaultValues: {
       ...initialData,
       publishDate: initialData?.publishDate 
         ? new Date(initialData.publishDate).toISOString().split('T')[0]
-        : new Date().toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0],
+      tags: initialData?.tags || [],
+      relatedCompanies: initialData?.relatedCompanies || []
     }
   });
+
+  const tags = watch('tags') || [];
+  const companies = watch('relatedCompanies') || [];
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow">
@@ -44,8 +56,9 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
 
       <form onSubmit={handleSubmit(onSubmit)} className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* English Content */}
           <div className="col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Title</label>
+            <label className="block text-sm font-medium text-gray-700">Title (English)</label>
             <input
               type="text"
               {...register('title')}
@@ -56,8 +69,18 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             )}
           </div>
 
+          {/* French Content */}
           <div className="col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Content</label>
+            <label className="block text-sm font-medium text-gray-700">Title (French)</label>
+            <input
+              type="text"
+              {...register('titleFr')}
+              className="mt-1 block w-full border rounded-md shadow-sm p-2 focus:ring-[#AE8766] focus:border-[#AE8766]"
+            />
+          </div>
+
+          <div className="col-span-1 md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">Content (English)</label>
             <textarea
               {...register('content')}
               rows={8}
@@ -68,6 +91,33 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             )}
           </div>
 
+          <div className="col-span-1 md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">Content (French)</label>
+            <textarea
+              {...register('contentFr')}
+              rows={8}
+              className="mt-1 block w-full border rounded-md shadow-sm p-2 focus:ring-[#AE8766] focus:border-[#AE8766]"
+            />
+          </div>
+
+          {/* Tags and Companies */}
+          <div className="col-span-1 md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">Tags</label>
+            <TagInput
+              tags={tags}
+              onTagsChange={(newTags) => setValue('tags', newTags)}
+            />
+          </div>
+
+          <div className="col-span-1 md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">Related Companies</label>
+            <TagInput
+              tags={companies}
+              onTagsChange={(newCompanies) => setValue('relatedCompanies', newCompanies)}
+            />
+          </div>
+
+          {/* Existing Fields */}
           <div className="col-span-1">
             <label className="block text-sm font-medium text-gray-700">Author</label>
             <input
