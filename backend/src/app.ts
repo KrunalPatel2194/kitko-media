@@ -9,11 +9,30 @@ import { apiRoutes } from './routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/Logger.middleware';
 import { logger } from './config/Logger';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
+
 
 const app = express();
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests from this IP'
+}));
 
-// Security middleware
-app.use(helmet());
+// Sanitization
+app.use(mongoSanitize());
+// Enhanced helmet config
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      scriptSrc: ["'self'"]
+    }
+  }
+}));
 
 // CORS setup
 app.use(cors({

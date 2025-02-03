@@ -1,5 +1,5 @@
 // src/validation/article.validation.ts
-import { validate } from '@/middleware/validation.middleware';
+import { validate } from '../middleware/validation.middleware';
 import { body, query, param } from 'express-validator';
 // src/validation/article.validation.ts
 
