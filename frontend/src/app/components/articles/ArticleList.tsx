@@ -1,4 +1,3 @@
-// src/components/articles/ArticleList.tsx
 'use client';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { SearchBar } from './SearchBar';
@@ -10,6 +9,7 @@ import { ArticleListMobile } from './ArticleListMobile';
 import { ArticleListDesktop } from './ArticleListDesktop';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { Pagination } from '../common/Pagination';
+import { useSidebar } from '../../context/SideBarContext';
 
 interface ToastProps {
   message: string;
@@ -17,13 +17,13 @@ interface ToastProps {
   onClose: () => void;
 }
 
-
 interface DeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   title: string;
 }
+
 const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onConfirm, title }) => {
   if (!isOpen) return null;
 
@@ -68,6 +68,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
     </div>
   );
 };
+
 export const ArticleList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,6 +76,7 @@ export const ArticleList = () => {
   const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
   const searchBarRef = useRef<{ resetSearch: () => void }>(null);
   
+  const { language } = useSidebar();
   const { data, isLoading, deleteMutation, prefetchNextPage } = useArticles(searchQuery, currentPage);
   const { toast, showToast } = useToast();
 
@@ -119,7 +121,9 @@ export const ArticleList = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between gap-4">
-        <h1 className="text-2xl font-semibold">Articles</h1>
+        <h1 className="text-2xl font-semibold">
+          {language === 'en' ? 'Articles' : 'Articles'}
+        </h1>
         <SearchBar 
           ref={searchBarRef}
           value={searchQuery}
@@ -133,12 +137,14 @@ export const ArticleList = () => {
 
       <ArticleListMobile
         articles={data?.data || []}
+        language={language}
         onPreview={setSelectedArticle}
         onDelete={handleDelete}
       />
 
       <ArticleListDesktop
         articles={data?.data || []}
+        language={language}
         onPreview={setSelectedArticle}
         onDelete={handleDelete}
       />

@@ -6,31 +6,45 @@ import { Edit2, Eye, Trash2 } from "lucide-react";
 
 interface ArticleListDesktopProps {
     articles: Article[];
+    language?: 'en' | 'fr';
     onPreview: (article: Article) => void;
     onDelete: (article: Article) => void;
-  }
+}
   
-  export const ArticleListDesktop: React.FC<ArticleListDesktopProps> = ({
+export const ArticleListDesktop: React.FC<ArticleListDesktopProps> = ({
     articles,
+    language = 'en',
     onPreview,
     onDelete
-  }) => (
+}) => (
     <div className="hidden sm:block bg-white rounded-lg shadow">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="text-left border-b">
-              <th className="p-4 font-medium">Title</th>
-              <th className="p-4 w-24">Status</th>
-              <th className="p-4 w-32">Created</th>
-              <th className="p-4 w-40">Author</th>
-              <th className="p-4 w-36 text-right">Actions</th>
+              <th className="p-4 font-medium">
+                {language === 'en' ? 'Title' : 'Titre'}
+              </th>
+              <th className="p-4 w-24">
+                {language === 'en' ? 'Status' : 'Statut'}
+              </th>
+              <th className="p-4 w-32">
+                {language === 'en' ? 'Created' : 'Créé'}
+              </th>
+              <th className="p-4 w-40">
+                {language === 'en' ? 'Author' : 'Auteur'}
+              </th>
+              <th className="p-4 w-36 text-right">
+                {language === 'en' ? 'Actions' : 'Actions'}
+              </th>
             </tr>
           </thead>
           <tbody>
             {articles.map((article) => (
               <tr key={article.id} className="border-b hover:bg-gray-50">
-                <td className="p-4">{article.title}</td>
+                <td className="p-4">
+                  {language === 'en' ? article.title : article.titleFr || article.title}
+                </td>
                 <td className="p-4">
                   <StatusBadge status={article.status} />
                 </td>
@@ -62,4 +76,4 @@ interface ArticleListDesktopProps {
         </table>
       </div>
     </div>
-  );
+);

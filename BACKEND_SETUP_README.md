@@ -3,6 +3,52 @@
 ## Project Repository
 [https://github.com/KrunalPatel2194/kitko-media.git](https://github.com/KrunalPatel2194/kitko-media.git)
 
+## Features
+
+### Core Backend Features
+- RESTful API for article management
+- MongoDB integration
+- Authentication and authorization
+- Comprehensive error handling
+- Logging and monitoring
+
+### New Advanced Features
+- **Bilingual Content Management**
+  - Multilingual article storage and retrieval
+  - Language-specific content validation
+  - Automatic translation support
+- AI-powered Article Generation
+  - Press release to article conversion
+  - Intelligent content extraction
+  - Bilingual title and content generation
+- Market Data Integration
+  - Real-time financial data retrieval
+  - WebSocket updates
+  - Company and market metadata extraction
+
+## Bilingual Implementation Details
+
+### Database Schema Enhancement
+```typescript
+interface Article {
+  title: string;          // English title
+  titleFr: string;        // French title
+  content: string;        // English content
+  contentFr: string;      // French content
+  language: 'en' | 'fr';  // Primary language
+  tags: string[];
+  relatedCompanies: string[];
+}
+```
+
+### Translation and AI Services
+- OpenAI API integration for:
+  - Automated translations
+  - Content generation
+  - SEO title creation
+- Fallback mechanisms for missing translations
+- Intelligent content parsing
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
@@ -10,6 +56,7 @@ Before you begin, ensure you have the following installed:
 - MongoDB
 - npm or yarn package manager
 - Git
+- OpenAI API Key
 
 ## Getting Started
 
@@ -39,33 +86,32 @@ MONGODB_URI=mongodb://localhost:27017/news_management
 # Authentication
 JWT_SECRET=your_jwt_secret_key
 
-# Rate Limiting
-RATE_LIMIT_WINDOW=15
-RATE_LIMIT_MAX_REQUESTS=100
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key
 
-# Logging
+# Language Services
+TRANSLATION_SERVICE_URL=https://translation.googleapis.com
+
+# WebSocket Configuration
+WS_PORT=5001
+
+# Logging and Monitoring
 LOG_LEVEL=debug
+ENABLE_AI_GENERATION=true
 ```
 
-## Database Setup
+## API Endpoints for Bilingual Content
 
-1. Start MongoDB service:
-```bash
-# On Linux
-sudo systemctl start mongodb
+### Article Endpoints
+- `GET /api/articles` - List articles with language support
+- `GET /api/articles/:id?lang=en|fr` - Retrieve article in specific language
+- `POST /api/articles/generate` - AI-powered article generation
+- `POST /api/articles/translate` - Manual translation endpoint
 
-# On macOS with Homebrew
-brew services start mongodb-community
-
-# On Windows (MongoDB should be running as a service)
-```
-
-2. Verify MongoDB connection:
-```bash
-mongo
-# or
-mongosh
-```
+### Language and Translation Endpoints
+- `POST /api/translate` - Translate content between languages
+- `GET /api/languages/supported` - List supported languages
+- `POST /api/seo/generate-title` - Generate SEO-friendly titles
 
 ## Running the Application
 
@@ -85,6 +131,15 @@ yarn build
 yarn start
 ```
 
+## AI Article Generation Workflow
+1. Receive press release text
+2. Extract key information
+3. Generate English content
+4. Translate to French
+5. Create SEO-optimized titles
+6. Extract tags and related companies
+7. Store bilingual article
+
 ## Testing
 
 1. Run all tests:
@@ -92,14 +147,9 @@ yarn start
 npm test
 ```
 
-2. Run tests in watch mode:
+2. Run tests with AI generation:
 ```bash
-npm run test:watch
-```
-
-3. Generate coverage report:
-```bash
-npm run test:coverage
+ENABLE_AI_TESTS=true npm test
 ```
 
 ## Project Structure
@@ -107,55 +157,61 @@ npm run test:coverage
 backend/
 ├── src/
 │   ├── config/       # Configuration files
-│   ├── controllers/  # Request handlers
-│   ├── middlewares/  # Express middlewares
-│   ├── models/       # Mongoose models
-│   ├── routes/       # API routes
+│   ├── controllers/  # Bilingual request handlers
+│   │   ├── articleController.ts
+│   │   └── translationController.ts
 │   ├── services/     # Business logic
-│   └── app.ts        # Main application file
-├── tests/            # Test files
-├── .env              # Environment variables
+│   │   ├── aiService.ts
+│   │   ├── translationService.ts
+│   │   └── marketDataService.ts
+│   ├── models/       # Enhanced Mongoose models
+│   └── utils/        # Utility functions
+│       ├── languageHelper.ts
+│       └── aiUtils.ts
+├── tests/            # Comprehensive test suite
 └── package.json      # Dependencies and scripts
 ```
 
-## Debugging
+## Debugging AI and Translation Services
 
-To run with debug logs:
+Enable verbose logging:
 ```bash
-DEBUG=app:* npm run dev
+DEBUG=ai:*,translation:* npm run dev
 ```
 
-## Linting and Formatting
+## Performance Considerations
+- Implement caching for translations
+- Use connection pooling for MongoDB
+- Optimize AI generation requests
+- Implement rate limiting on AI endpoints
 
-1. Run linting:
+## Common Troubleshooting
+
+1. OpenAI API Issues
 ```bash
-npm run lint
+# Check API key configuration
+echo $OPENAI_API_KEY
+
+# Verify network connectivity
+curl https://api.openai.com/v1/models
 ```
 
-2. Fix linting issues:
+2. MongoDB Connection
 ```bash
-npm run lint:fix
-```
-
-## Common Issues and Solutions
-
-1. MongoDB connection issues:
-```bash
-# Check MongoDB service status
+# Check MongoDB service
 sudo systemctl status mongodb
 
-# Check MongoDB logs
-tail -f /var/log/mongodb/mongod.log
+# Verify connection string
+mongo $MONGODB_URI
 ```
 
-2. Port already in use:
-```bash
-# Find process using port 5000
-lsof -i :5000
-# Kill the process
-kill -9 <PID>
-```
+## Future Roadmap
+- Enhanced AI content analysis
+- More granular language support
+- Machine learning-powered translation improvements
+- Real-time collaborative translation
 
-## Support
-
-For issues and feature requests, please create an issue in the [GitHub repository](https://github.com/KrunalPatel2194/kitko-media/issues).
+## Support and Contributions
+- Report issues on GitHub
+- Pull requests welcome
+- Follow contribution guidelines

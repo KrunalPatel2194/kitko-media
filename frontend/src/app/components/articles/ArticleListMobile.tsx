@@ -3,22 +3,27 @@ import { Article } from "../../types/article";
 import { Button } from "../common/Button";
 import { StatusBadge } from "../common/StatusBadge";
 import { Edit2, Eye, Trash2 } from "lucide-react";
+
 interface ArticleListMobileProps {
     articles: Article[];
+    language?: 'en' | 'fr';
     onPreview: (article: Article) => void;
     onDelete: (article: Article) => void;
-  }
+}
   
-  export const ArticleListMobile: React.FC<ArticleListMobileProps> = ({
+export const ArticleListMobile: React.FC<ArticleListMobileProps> = ({
     articles,
+    language = 'en',
     onPreview,
     onDelete
-  }) => (
+}) => (
     <div className="block sm:hidden">
       {articles.map((article) => (
         <div key={article.id} className="bg-white rounded-lg shadow mb-4 p-4">
           <div className="mb-2">
-            <h3 className="font-medium">{article.title}</h3>
+            <h3 className="font-medium">
+              {language === 'en' ? article.title : article.titleFr || article.title}
+            </h3>
             <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
               <StatusBadge status={article.status} />
               <span>•</span>
@@ -46,4 +51,4 @@ interface ArticleListMobileProps {
         </div>
       ))}
     </div>
-  );
+);

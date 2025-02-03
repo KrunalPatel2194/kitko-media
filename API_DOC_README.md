@@ -17,66 +17,29 @@ Include the token in all authenticated requests:
 Authorization: Bearer <your_jwt_token>
 ```
 
-To obtain a token, use the authentication endpoints below.
+## Bilingual Content Management
+
+### Language Support
+- Supported languages: English (en), French (fr)
+- Bilingual content storage
+- Automatic translation services
+- Language-specific search and retrieval
 
 ## Endpoints
 
-### Authentication
+### Articles
 
-#### Register New User
-```http
-POST /auth/register
-
-Request:
-{
-  "email": "user@example.com",
-  "password": "securepassword",
-  "name": "John Doe"
-}
-
-Response: 201 Created
-{
-  "message": "User registered successfully",
-  "data": {
-    "id": "user_id",
-    "email": "user@example.com",
-    "name": "John Doe"
-  }
-}
-```
-
-#### Login
-```http
-POST /auth/login
-
-Request:
-{
-  "email": "user@example.com",
-  "password": "securepassword"
-}
-
-Response: 200 OK
-{
-  "token": "jwt_token",
-  "user": {
-    "id": "user_id",
-    "email": "user@example.com",
-    "name": "John Doe"
-  }
-}
-```
-
-### News Articles
-
-#### Get All Articles
+#### Get Articles (Enhanced)
 ```http
 GET /articles
 
 Query Parameters:
 - page (optional): Current page number (default: 1)
 - limit (optional): Items per page (default: 10)
-- category (optional): Filter by category
+- status (optional): Filter by article status (draft/published)
+- category (optional): Filter by category (mining/crypto)
 - search (optional): Search in title and content
+- language (optional): Language of search (en/fr, default: en)
 
 Response: 200 OK
 {
@@ -84,14 +47,13 @@ Response: 200 OK
     {
       "id": "article_id",
       "title": "Article Title",
+      "titleFr": "Titre de l'article",
       "content": "Article content...",
+      "contentFr": "Contenu de l'article...",
       "category": "Technology",
-      "author": {
-        "id": "author_id",
-        "name": "Author Name"
-      },
-      "createdAt": "2024-02-02T12:00:00Z",
-      "updatedAt": "2024-02-02T12:00:00Z"
+      "language": "en",
+      "tags": ["tech", "innovation"],
+      "relatedCompanies": ["Company A", "Company B"]
     }
   ],
   "pagination": {
@@ -102,23 +64,29 @@ Response: 200 OK
 }
 ```
 
-#### Get Single Article
+#### Get Single Article (Multilingual)
 ```http
 GET /articles/:id
+
+Query Parameters:
+- language (optional): Specify language (en/fr, default: en)
 
 Response: 200 OK
 {
   "data": {
     "id": "article_id",
     "title": "Article Title",
+    "titleFr": "Titre de l'article",
     "content": "Article content...",
+    "contentFr": "Contenu de l'article...",
     "category": "Technology",
-    "author": {
-      "id": "author_id",
-      "name": "Author Name"
-    },
-    "createdAt": "2024-02-02T12:00:00Z",
-    "updatedAt": "2024-02-02T12:00:00Z"
+    "marketData": {
+      "Company A": {
+        "price": 100.50,
+        "marketCap": 1000000,
+        "change24h": 2.5
+      }
+    }
   }
 }
 ```
@@ -131,137 +99,129 @@ Authorization: Required
 Request:
 {
   "title": "New Article Title",
+  "titleFr": "Titre du nouvel article",
   "content": "Article content...",
-  "category": "Technology"
-}
-
-Response: 201 Created
-{
-  "message": "Article created successfully",
-  "data": {
-    "id": "new_article_id",
-    "title": "New Article Title",
-    "content": "Article content...",
-    "category": "Technology",
-    "author": {
-      "id": "author_id",
-      "name": "Author Name"
-    },
-    "createdAt": "2024-02-02T12:00:00Z",
-    "updatedAt": "2024-02-02T12:00:00Z"
-  }
+  "contentFr": "Contenu de l'article...",
+  "category": "Technology",
+  "tags": ["tech", "innovation"],
+  "relatedCompanies": ["Company A"]
 }
 ```
 
-#### Update Article
+#### Advanced Article Search
 ```http
-PUT /articles/:id
+GET /articles/search/advanced
+
+Query Parameters:
+- tags (optional): Comma-separated list of tags
+- companies (optional): Comma-separated list of companies
+- startDate (optional): Start date for publication
+- endDate (optional): End date for publication
+- language (optional): Language preference
+
+Response: Similar to Get Articles
+```
+
+### AI-Powered Article Generation
+
+#### Generate Article from Press Release
+```http
+POST /articles/generate
 Authorization: Required
 
 Request:
 {
-  "title": "Updated Title",
-  "content": "Updated content...",
-  "category": "Science"
+  "pressRelease": "Full press release text...",
+  "language": "en" // Optional, default: en
 }
 
-Response: 200 OK
+Response: 201 Created
 {
-  "message": "Article updated successfully",
   "data": {
-    "id": "article_id",
-    "title": "Updated Title",
-    "content": "Updated content...",
-    "category": "Science",
-    "author": {
-      "id": "author_id",
-      "name": "Author Name"
-    },
-    "updatedAt": "2024-02-02T12:30:00Z"
+    "id": "generated_article_id",
+    "title": "Generated Article Title",
+    "titleFr": "Titre de l'article généré",
+    "content": "AI-generated article content...",
+    "contentFr": "Contenu de l'article généré...",
+    "tags": ["generated", "ai"],
+    "relatedCompanies": ["Company A"],
+    "status": "draft"
   }
 }
 ```
 
-#### Delete Article
+### Market Data
+
+#### Get Market Data
 ```http
-DELETE /articles/:id
-Authorization: Required
+GET /market/data
 
-Response: 200 OK
+Query Parameters:
+- symbols: Comma-separated list of company symbols
+
+Response:
 {
-  "message": "Article deleted successfully"
-}
-```
-
-## Error Codes and Meanings
-
-### Client Error Responses (4xx)
-
-- `400 Bad Request`
-  - Invalid request payload
-  - Missing required fields
-  - Invalid query parameters
-
-- `401 Unauthorized`
-  - Missing authentication token
-  - Invalid authentication token
-  - Expired token
-
-- `403 Forbidden`
-  - Valid token but insufficient permissions
-  - Attempting to modify another user's content
-
-- `404 Not Found`
-  - Resource not found
-  - Invalid endpoint
-
-- `422 Unprocessable Entity`
-  - Validation error
-  - Business logic error
-
-- `429 Too Many Requests`
-  - Rate limit exceeded
-
-### Server Error Responses (5xx)
-
-- `500 Internal Server Error`
-  - Unexpected server error
-  - Database error
-
-- `503 Service Unavailable`
-  - Server is temporarily unable to handle the request
-  - Maintenance mode
-
-## Error Response Format
-```json
-{
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Human readable error message",
-    "details": {
-      "field": "Specific field error description"
-    }
+  "Company A": {
+    "price": 100.50,
+    "marketCap": 1000000,
+    "change24h": 2.5
+  },
+  "Company B": {
+    "price": 75.25,
+    "marketCap": 500000,
+    "change24h": -1.2
   }
 }
 ```
 
 ## Rate Limiting
 
-The API implements rate limiting to prevent abuse:
-- Window: 15 minutes
-- Max Requests: 100 per window
-- Headers provided:
-  - `X-RateLimit-Limit`: Max requests allowed per window
-  - `X-RateLimit-Remaining`: Remaining requests in current window
-  - `X-RateLimit-Reset`: Time when the rate limit resets (Unix timestamp)
+- General API Endpoints: 100 requests per 15 minutes
+- AI Generation Endpoints: Stricter limits to prevent abuse
+- Market Data Endpoints: Controlled access
 
-## Data Validation
+## Error Handling
 
-- String fields have maximum lengths
-- Dates must be in ISO 8601 format
-- IDs must be valid MongoDB ObjectIds
-- Categories must be one of predefined values
+Standard error response format:
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Detailed error description",
+    "details": {
+      "field": "Specific error details"
+    }
+  }
+}
+```
 
-## Support
+### Common Error Codes
+- `VALIDATION_ERROR`: Invalid input
+- `AUTHENTICATION_ERROR`: Authentication failure
+- `ARTICLE_NOT_FOUND`: Resource not found
+- `AI_SERVICE_ERROR`: AI generation failed
+- `MARKET_DATA_ERROR`: Market data retrieval issue
 
-For API-related issues and feature requests, please create an issue in the [GitHub repository](https://github.com/KrunalPatel2194/kitko-media/issues).
+## AI Service Details
+
+### Translation Capabilities
+- Press release to article conversion
+- Bilingual content generation
+- SEO title creation
+- Metadata extraction
+
+### Supported Languages
+- English (en)
+- French (fr)
+
+## Best Practices
+
+1. Always include language parameter for multilingual content
+2. Use AI generation endpoints sparingly
+3. Implement client-side caching
+4. Handle potential translation fallbacks
+
+## Changelog
+- v1.1.0: Added bilingual support
+- v1.2.0: Enhanced AI article generation
+- v1.3.0: Market data integration
