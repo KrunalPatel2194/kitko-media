@@ -1,4 +1,4 @@
-import { IArticle } from "@/types/article.types";
+import { IArticle } from "../types/article.types";
 
 // src/utils/seo.ts
 export const generateMetadata = (article: IArticle) => ({

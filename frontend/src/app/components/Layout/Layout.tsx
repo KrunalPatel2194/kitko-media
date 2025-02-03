@@ -43,12 +43,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             >
               Create Article
             </Link>
-            <Link 
+            {/* <Link 
               href="/articles/generate" 
               className="flex items-center px-4 py-3 text-sm text-white rounded-md hover:bg-[#AE8766] transition-colors"
             >
               Generate Article
-            </Link>
+            </Link> */}
           </nav>
 
           <div className="mt-auto">

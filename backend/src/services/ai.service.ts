@@ -1,7 +1,8 @@
 // src/services/ai.service.ts
 import OpenAI from 'openai';
 import { ApiError } from '../utils/ApiError';
-
+import dotenv from 'dotenv';
+dotenv.config();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -20,7 +21,7 @@ export class AIService {
   ): Promise<string> {
     try {
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
@@ -78,4 +79,5 @@ export class AIService {
       `Generate SEO-friendly title (max 60 chars):\n${content.substring(0, 500)}`
     );
   }
+  
 }

@@ -10,7 +10,7 @@ export const PressReleaseForm = () => {
   const [language, setLanguage] = useState<'en' | 'fr'>('en');
   const router = useRouter();
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (data: { pressRelease: string; language: 'en' | 'fr' }) => 
       ArticleService.generateFromPressEnhanced(data),
     onSuccess: (data) => {
@@ -73,10 +73,10 @@ export const PressReleaseForm = () => {
 
             <button 
               type="submit"
-              disabled={isLoading}
+              disabled={isPending}
               className="w-full py-3 bg-[#AE8766] text-white rounded-lg hover:bg-[#8e6d52] disabled:opacity-50"
             >
-              {isLoading ? 'Generating Article...' : 'Generate Article'}
+              {isPending ? 'Generating Article...' : 'Generate Article'}
             </button>
           </div>
         </form>

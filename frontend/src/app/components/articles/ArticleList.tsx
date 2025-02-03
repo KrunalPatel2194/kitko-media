@@ -104,6 +104,7 @@ export const ArticleList = () => {
         await deleteMutation.mutateAsync(articleToDelete.id);
         showToast('Article deleted successfully');
       } catch (error) {
+        console.log(error)
         showToast('Failed to delete article', 'error');
       } finally {
         setArticleToDelete(null);
@@ -167,7 +168,7 @@ export const ArticleList = () => {
         <Toast
           message={toast.message}
           type={toast.type}
-          onClose={() => showToast(null)}
+          onClose={() => showToast(toast.message, 'success')}
         />
       )}
     </div>

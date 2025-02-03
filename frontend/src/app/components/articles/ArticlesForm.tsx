@@ -2,7 +2,6 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Article } from '../../types/article';
 import { TagInput } from './../common/TagInput';
 
 const articleSchema = z.object({
@@ -20,6 +19,11 @@ const articleSchema = z.object({
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 
+interface ArticleFormProps {
+  initialData?: Partial<ArticleFormData>;
+  onSubmit: (data: ArticleFormData) => void;
+  isLoading?: boolean;
+}
 export const ArticleForm: React.FC<ArticleFormProps> = ({
   initialData,
   onSubmit,

@@ -1,11 +1,13 @@
 'use client'
+import { Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { ArticleForm } from '../../components/articles/ArticlesForm'
 import { Layout } from '../../components/Layout/Layout'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { ArticleService } from '../../services/api'
+import { Article } from '../../types/article'
 
-export default function EditArticle() {
+function EditArticleContent() {
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
   const router = useRouter()
@@ -17,7 +19,7 @@ export default function EditArticle() {
   })
 
   const { mutate } = useMutation({
-    mutationFn: (data) => ArticleService.update(id as string, data),
+    mutationFn: (data: Partial<Article>) => ArticleService.update(id as string, data),
     onSuccess: () => router.push('/')
   })
 
@@ -25,5 +27,13 @@ export default function EditArticle() {
     <Layout>
       {article && <ArticleForm initialData={article} onSubmit={mutate} />}
     </Layout>
+  )
+}
+
+export default function EditArticle() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EditArticleContent />
+    </Suspense>
   )
 }

@@ -7,16 +7,16 @@ import { ArticleService } from '../../services/api'
 
 export default function CreateArticle() {
   const router = useRouter()
-  const { mutate, isLoading } = useMutation({
+  const { mutate,  isPending } = useMutation({
     mutationFn: ArticleService.create,
     onSuccess: () => router.push('/')
-  })
+  });
 
   return (
     <Layout>
       <div className="max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Create Article</h1>
-        <ArticleForm onSubmit={mutate} isLoading={isLoading} />
+        <ArticleForm onSubmit={mutate} isLoading={isPending} />
       </div>
     </Layout>
   )

@@ -1,14 +1,4 @@
-// src/types/article.ts
-export interface Article {
-  id: string;
-  title: string;
-  status: 'published' | 'draft';
-  createdAt: string;
-  author: string;
-  content: string;
-}
 
-// src/hooks/useToast.ts
 import { useState, useCallback } from 'react';
 
 export interface ToastState {

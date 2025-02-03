@@ -1,8 +1,9 @@
-import React from "react";
-export function useDebounce<T>(value: T, callback: (value: T) => void, delay: number) {
-  const timeoutRef = React.useRef<NodeJS.Timeout>();
+import { useRef, useEffect } from "react";
 
-  React.useEffect(() => {
+export function useDebounce<T>(value: T, callback: (value: T) => void, delay: number) {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
