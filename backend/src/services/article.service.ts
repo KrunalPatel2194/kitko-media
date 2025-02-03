@@ -1,6 +1,6 @@
 import { Article } from '../models/Article';
-import { IArticle, PaginationParams, PaginatedResponse } from '../types/article.types';
-import { ApiError } from '../utils/ApiError';
+import { IArticle, PaginationParams, PaginatedResponse, GetArticlesParams } from '../types/article.types';
+import  { ApiError}  from '../utils/ApiError';
 
 export class ArticleService {
   static async createArticle(articleData: IArticle): Promise<IArticle> {
@@ -10,28 +10,53 @@ export class ArticleService {
   }
 
   // src/services/article.service.ts
-static async getArticles({ page = 1, limit = 10, status, category, query }: GetArticlesParams): Promise<PaginatedResponse<IArticle>> {
-    const searchQuery = {
-      ...(status && { status }),
-      ...(category && { category }),
-      ...(query && query)
-    };
-  
-    const [articles, total] = await Promise.all([
-      Article.find(searchQuery)
+  static async getArticles({
+    page = 1,
+    limit = 10,
+    status,
+    category,
+    query = {}
+  }: {
+    page?: number;
+    limit?: number;
+    status?: 'draft' | 'published';
+    category?: 'mining' | 'crypto';
+    query?: any;
+  }) {
+    // Ensure page and limit are valid numbers
+    const validPage = Math.max(1, page);
+    const validLimit = Math.max(1, Math.min(100, limit)); // Cap at 100 items per page
+    const skip = (validPage - 1) * validLimit;
+
+    // Build query
+    const finalQuery = { ...query };
+    if (status) finalQuery.status = status;
+    if (category) finalQuery.category = category;
+
+    // Execute queries in parallel
+    const [data, totalItems] = await Promise.all([
+      Article.find(finalQuery)
         .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit),
-      Article.countDocuments(searchQuery)
+        .skip(skip)
+        .limit(validLimit)
+        .exec(),
+      Article.countDocuments(finalQuery)
     ]);
-  
+
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalItems / validLimit);
+    const hasNextPage = validPage < totalPages;
+    const hasPrevPage = validPage > 1;
+
     return {
-      data: articles.map(article => article.toJSON()),
+      data,
       pagination: {
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalItems: total,
-        itemsPerPage: limit
+        currentPage: validPage,
+        totalPages,
+        totalItems,
+        hasNextPage,
+        hasPrevPage,
+        limit: validLimit
       }
     };
   }

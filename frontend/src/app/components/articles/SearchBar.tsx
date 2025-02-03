@@ -1,36 +1,40 @@
 // src/components/articles/SearchBar.tsx
-import React, { useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useDebounce } from '../../hooks/useDebounce';
-
 interface SearchBarProps {
   onSearch: (query: string) => void;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
-  const [query, setQuery] = useState('');
-  const debouncedSearch = useDebounce(onSearch, 300);
+
+export const SearchBar = forwardRef(({ value, onSearch }, ref) => {
+  const [localValue, setLocalValue] = useState(value);
+
+  useDebounce(localValue, onSearch, 2000);
+
+  useImperativeHandle(ref, () => ({
+    resetSearch: () => setLocalValue('')
+  }));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-    debouncedSearch(value);
+    setLocalValue(e.target.value);
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <Search className="h-5 w-5 text-gray-400" />
       </div>
       <input
         type="text"
-        value={query}
+        value={localValue}
         onChange={handleChange}
         placeholder="Search articles..."
-        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm 
+        bg-white placeholder-gray-500 focus:outline-none focus:ring-1 
+        focus:ring-[#AE8766] focus:border-[#AE8766]"
       />
     </div>
   );
-};
-
-// src/hooks/useDebounce.ts
+});
+SearchBar.displayName = 'SearchBar';

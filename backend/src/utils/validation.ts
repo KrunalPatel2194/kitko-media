@@ -15,11 +15,6 @@ export const validateRequest = (req: Request): void => {
       return acc;
     }, {} as Record<string, string[]>);
 
-    throw new ApiError(
-      'Validation failed',
-      400,
-      'VALIDATION_ERROR',
-      { fields: formattedErrors }
-    );
+    throw ApiError.validation(formattedErrors);
   }
 };

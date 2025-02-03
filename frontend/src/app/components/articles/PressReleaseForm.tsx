@@ -1,40 +1,52 @@
+// src/components/articles/PressReleaseForm.tsx
 'use client'
-import { ArticleService } from '@/app/services/api';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+// import { ArticleService } from '@/services/api';
+import { useRouter } from 'next/navigation';
+import { ArticleService } from '@/app/services/api';
 
 export const PressReleaseForm = () => {
-  const [pressRelease, setPressRelease] = useState('');
-  const router = useRouter();
+ const [pressRelease, setPressRelease] = useState('');
+ const router = useRouter();
 
-  const { mutate, isLoading } = useMutation({
-    mutationFn: (data: { pressRelease: string }) => ArticleService.generateFromPress(data),
-    onSuccess: () => router.push('/')
-  });
+ const { mutate, isLoading } = useMutation({
+   mutationFn: (data: { pressRelease: string }) => ArticleService.generateFromPress(data),
+   onSuccess: (data) => {
+     router.push(`/articles/preview?id=${data.id}`);
+   }
+ });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pressRelease) {
-      mutate({ pressRelease });
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <textarea 
-        value={pressRelease}
-        onChange={(e) => setPressRelease(e.target.value)}
-        className="w-full h-64 p-4 border rounded"
-        required
-      />
-      <button 
-        type="submit"
-        disabled={isLoading}
-        className="px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        {isLoading ? 'Generating...' : 'Generate Article'}
-      </button>
-    </form>
-  );
+ return (
+   <div className="max-w-4xl mx-auto p-6">
+     <h1 className="text-2xl font-bold mb-4">Generate Article from Press Release</h1>
+     <form onSubmit={(e) => {
+       e.preventDefault();
+       mutate({ pressRelease });
+     }}>
+       <div className="space-y-4">
+         <div>
+           <label className="block text-sm font-medium text-gray-700 mb-2">
+             Press Release Content
+           </label>
+           <textarea 
+             value={pressRelease}
+             onChange={(e) => setPressRelease(e.target.value)}
+             rows={10}
+             className="w-full p-4 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"
+             placeholder="Paste your press release here..."
+             required
+           />
+         </div>
+         <button 
+           type="submit"
+           disabled={isLoading}
+           className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+         >
+           {isLoading ? 'Generating Article...' : 'Generate Article'}
+         </button>
+       </div>
+     </form>
+   </div>
+ );
 };

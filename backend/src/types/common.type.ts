@@ -21,3 +21,19 @@ export interface PaginationParams {
     details?: Record<string, unknown>;
   }
   
+  export interface PaginationOptions {
+    page?: number;
+    limit?: number;
+  }
+  
+  export interface PaginationResult<T> {
+    data: T[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalItems: number;
+      hasNextPage: boolean;
+      hasPrevPage: boolean;
+      limit: number;
+    };
+  }

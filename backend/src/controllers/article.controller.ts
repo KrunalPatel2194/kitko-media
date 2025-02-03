@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { ArticleService } from '../services/article.service';
 import { catchAsync } from '../utils/catchAsync';
 import { validateRequest } from '../utils/validation';
-import { ApiError } from '../utils/ApiError';
+import  {ApiError}  from '../utils/ApiError';
 import { AIService } from '../services/ai.service';
 import { MarketService } from '../services/market.service';
 
